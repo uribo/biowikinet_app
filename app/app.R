@@ -9,6 +9,10 @@ library(shinyWidgets)
 # input <- NULL
 # input$language_version <- "ja"
 # input$species_search <- "アカガシ"
+# d <- .filter_nodes(nodes, lang = input$language_version)
+# d |> 
+#   dplyr::filter(
+#         stringr::str_detect(label, stringr::regex(input$species_search, ignore_case = TRUE)))
 ###############
 
 nodes <-
@@ -20,6 +24,7 @@ edges <-
 ui <- page_fluid(
   fillable = TRUE,
   theme = bs_theme(version = 5, bootswatch = "minty"),
+  shinyjs::useShinyjs(),
   tags$head(
     tags$style(HTML("
       html, body, .container-fluid {
@@ -42,6 +47,64 @@ ui <- page_fluid(
         height: calc(100vh - 58px);
         padding: 0.5rem;
         gap: 0.5rem;
+      }
+      .metric-card {
+        background-color: #f77e7e;
+        color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .metric-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+      }
+      .metric-label {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+      .node-header {
+        margin-bottom: 1.5rem;
+      }
+      .node-taxonomy {
+        color: #18bc9c;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+      }
+      .node-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+        line-height: 1.5;
+      }
+      .node-image-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-right: 1.5rem;
+        flex-shrink: 0;
+      }
+      .node-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .node-image-placeholder {
+        font-size: 3rem;
+        color: #dee2e6;
       }
       .search-results {
         position: absolute;
@@ -112,7 +175,7 @@ ui <- page_fluid(
           class = "position-relative",
           textInput("species_search", 
                     label = "分類群名を検索 (Search taxon)",
-                    placeholder = "例: ネコ, イヌ, サクラ..."),
+                    placeholder = "例: アカガシ、ブナ、ニジマス..."),
           uiOutput("search_results")
         ),
         
@@ -207,7 +270,8 @@ server <- function(input, output, session) {
     
     search_term <- input$species_search
     
-    matching_nodes <- filtered_nodes() |> 
+    matching_nodes <- 
+      filtered_nodes() |> 
       dplyr::filter(
         stringr::str_detect(label, stringr::regex(search_term, ignore_case = TRUE))
       ) |> 
@@ -231,9 +295,11 @@ server <- function(input, output, session) {
           onclick = sprintf("Shiny.setInputValue('add_taxon', '%s', {priority: 'event'})", node$id),
           tags$strong(node$label),
           tags$small(class = "text-muted ms-2", 
-                     sprintf("(%s, Core: %.1f)", 
-                             stringr::str_extract(node$id, "^[^:]+"), 
-                             node$core_index))
+                     sprintf("(%s%s)", 
+                             stringr::str_extract(node$id, "^[^:]+"),
+                             if(!is.na(node$core_index) && node$core_index > 0) 
+                               paste0(", Core: ", round(node$core_index, 1)) 
+                             else ""))
         )
       })
     )
@@ -254,6 +320,13 @@ server <- function(input, output, session) {
         )
         selected_taxa(current_taxa)
       }
+      
+      # ネットワーク内のノードを選択状態にする
+      # 少し遅延を入れてネットワークが更新されるのを待つ
+      shinyjs::delay(500, {
+        visNetworkProxy("network_view") |> 
+          visSelectNodes(id = input$add_taxon)
+      })
     }
     
     updateTextInput(session, "species_search", value = "")
@@ -373,32 +446,91 @@ server <- function(input, output, session) {
       return(div("ノード情報が見つかりません"))
     }
     
+    # 実際の値を取得（NAの場合はデフォルト値を使用）
+    pageviews <- if(!is.na(node_info$pageviews)) node_info$pageviews else 0
+    edit_count <- if(!is.na(node_info$edit_count)) node_info$edit_count else 0
+    core_index <- if(!is.na(node_info$core_index)) node_info$core_index else 0
+    sci_value <- if(!is.na(node_info$sci)) node_info$sci else 0
+    
     div(
-      tags$h5(node_info$label, class = "mb-3"),
-      tags$table(class = "table table-sm",
-        tags$tbody(
-          tags$tr(
-            tags$td("Node ID:"),
-            tags$td(tags$code(node_info$id))
-          ),
-          tags$tr(
-            tags$td("言語:"),
-            tags$td(stringr::str_extract(node_info$id, "^[^:]+"))
-          ),
-          tags$tr(
-            tags$td("Core Index:"),
-            tags$td(sprintf("%.2f", node_info$core_index))
-          ),
-          tags$tr(
-            tags$td("SCI:"),
-            tags$td(sprintf("%.3f", node_info$sci))
-          ),
-          if (!is.na(node_info$size)) {
-            tags$tr(
-              tags$td("サイズ:"),
-              tags$td(format(node_info$size, big.mark = ","))
-            )
+      div(class = "d-flex mb-3",
+        div(class = "node-image-container",
+          # プレースホルダー画像 - 実際の画像URLがある場合はここに設定
+          if (FALSE) {  # 画像URLが利用可能な場合の条件
+            tags$img(src = "placeholder.png", class = "node-image", alt = node_info$label)
+          } else {
+            icon("image", class = "node-image-placeholder")
           }
+        ),
+        div(class = "flex-grow-1",
+          div(class = "node-header",
+            div(class = "node-taxonomy", paste("Animalia / Chordata /", node_info$label)),
+            tags$h4(node_info$label, class = "mb-1"),
+            tags$div(class = "text-muted", 
+                     stringr::str_extract(node_info$id, "^[^:]+"),
+                     " (", if(!is.null(node_info$identifier)) node_info$identifier else "Common name", ")")
+          )
+        )
+      ),
+      
+      div(class = "node-description",
+        if(!is.na(node_info$abstract) && nchar(node_info$abstract) > 0) {
+          if(nchar(node_info$abstract) > 200) {
+            tags$span(
+              substr(node_info$abstract, 1, 200),
+              "...",
+              tags$a(href = "#", class = "text-primary ms-1", "Read more")
+            )
+          } else {
+            node_info$abstract
+          }
+        } else {
+          "この分類群についての説明文は利用できません。"
+        }
+      ),
+      
+      tags$hr(),
+      
+      div(class = "row g-3 mt-3",
+        div(class = "col-6",
+          div(class = "metric-card",
+            div(class = "metric-icon", icon("eye")),
+            div(class = "metric-label", "Pageviews"),
+            div(class = "metric-value", 
+                if (pageviews == 0) {
+                  "N/A"
+                } else if (pageviews > 1000000) {
+                  paste0(round(pageviews/1000000, 1), "M")
+                } else if (pageviews > 1000) {
+                  paste0(round(pageviews/1000), "K")
+                } else {
+                  format(pageviews, big.mark = ",")
+                })
+          )
+        ),
+        div(class = "col-6",
+          div(class = "metric-card",
+            div(class = "metric-icon", icon("edit")),
+            div(class = "metric-label", "Edit Count"),
+            div(class = "metric-value", 
+                if (edit_count == 0) "N/A" else format(edit_count, big.mark = ","))
+          )
+        ),
+        div(class = "col-6",
+          div(class = "metric-card",
+            div(class = "metric-icon", icon("star")),
+            div(class = "metric-label", "Core Index"),
+            div(class = "metric-value", 
+                if (core_index == 0) "N/A" else round(core_index, 1))
+          )
+        ),
+        div(class = "col-6",
+          div(class = "metric-card",
+            div(class = "metric-icon", icon("sitemap")),
+            div(class = "metric-label", "SCI"),
+            div(class = "metric-value", 
+                if (sci_value == 0) "N/A" else sprintf("%.2f", sci_value))
+          )
         )
       )
     )
