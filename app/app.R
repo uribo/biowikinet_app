@@ -74,9 +74,16 @@ ui <- page_fluid(
         margin-bottom: 1.5rem;
       }
       .node-taxonomy {
-        color: #18bc9c;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
+        display: inline-block;
+        background-color: #18bc9c;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
       .node-description {
         color: #666;
@@ -464,11 +471,19 @@ server <- function(input, output, session) {
         ),
         div(class = "flex-grow-1",
           div(class = "node-header",
-            div(class = "node-taxonomy", paste("Animalia / Chordata /", node_info$label)),
+            if(!is.na(node_info$taxon_rank) && nchar(node_info$taxon_rank) > 0) {
+              div(class = "node-taxonomy", node_info$taxon_rank)
+            },
             tags$h4(node_info$label, class = "mb-1"),
             tags$div(class = "text-muted", 
-                     stringr::str_extract(node_info$id, "^[^:]+"),
-                     " (", if(!is.null(node_info$identifier)) node_info$identifier else "Common name", ")")
+                     if(!is.na(node_info$canonical_name) && nchar(node_info$canonical_name) > 0) {
+                       tags$em(node_info$canonical_name)
+                     } else {
+                       node_info$label
+                     },
+                     if(!is.na(node_info$taxonomic_status) && nchar(node_info$taxonomic_status) > 0) {
+                       tags$span(class = "ms-2", paste0("(", node_info$taxonomic_status, ")"))
+                     })
           )
         )
       ),
