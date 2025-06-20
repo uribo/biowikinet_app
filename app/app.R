@@ -85,6 +85,30 @@ ui <- page_fluid(
         margin-bottom: 0.75rem;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
+      .node-taxonomy.kingdom {
+        background-color: #8e44ad;
+      }
+      .node-taxonomy.phylum {
+        background-color: #3498db;
+      }
+      .node-taxonomy.class {
+        background-color: #2ecc71;
+      }
+      .node-taxonomy.order {
+        background-color: #f39c12;
+      }
+      .node-taxonomy.family {
+        background-color: #e74c3c;
+      }
+      .node-taxonomy.genus {
+        background-color: #e67e22;
+      }
+      .node-taxonomy.species {
+        background-color: #1abc9c;
+      }
+      .node-taxonomy.other {
+        background-color: #95a5a6;
+      }
       .node-description {
         color: #666;
         font-size: 0.9rem;
@@ -472,7 +496,12 @@ server <- function(input, output, session) {
         div(class = "flex-grow-1",
           div(class = "node-header",
             if(!is.na(node_info$taxon_rank) && nchar(node_info$taxon_rank) > 0) {
-              div(class = "node-taxonomy", node_info$taxon_rank)
+              rank_class <- if(node_info$taxon_rank %in% c("kingdom", "phylum", "class", "order", "family", "genus", "species")) {
+                paste("node-taxonomy", node_info$taxon_rank)
+              } else {
+                "node-taxonomy other"
+              }
+              div(class = rank_class, node_info$taxon_rank)
             },
             tags$h4(node_info$label, class = "mb-1"),
             tags$div(class = "text-muted", 
