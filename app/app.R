@@ -519,17 +519,28 @@ server <- function(input, output, session) {
       
       div(class = "node-description",
         if(!is.na(node_info$abstract) && nchar(node_info$abstract) > 0) {
+          div(
           if(nchar(node_info$abstract) > 200) {
             tags$span(
               substr(node_info$abstract, 1, 200),
-              "...",
-              tags$a(href = "#", class = "text-primary ms-1", "Read more")
+                "..."
             )
           } else {
             node_info$abstract
+            },
+            tags$br(),
+            if(!is.na(node_info$url) && nchar(node_info$url) > 0) {
+              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", "Read more")
           }
+          )
         } else {
-          "この分類群についての説明文は利用できません。"
+          div(
+            "この分類群についての説明文は利用できません。",
+            tags$br(),
+            if(!is.na(node_info$url) && nchar(node_info$url) > 0) {
+              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", "Read more")
+            }
+          )
         }
       ),
       
