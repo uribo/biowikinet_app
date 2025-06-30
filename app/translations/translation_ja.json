@@ -10,6 +10,10 @@
       "en": "Explorer"
     },
     {
+      "ja": "検索",
+      "en": "Search"
+    },
+    {
       "ja": "検索 & フィルター",
       "en": "Search & Filter"
     },
@@ -31,7 +35,7 @@
     },
     {
       "ja": "例: アカガシ、ブナ、ニジマス...",
-      "en": "e.g. Cat, Oak, Beech, ..."
+      "en": "e.g. Homo sapiens, American bison, Sequoia sempervirens ..."
     },
     {
       "ja": "選択された分類群",
@@ -124,6 +128,38 @@
     {
       "ja": "英語",
       "en": "English"
+    },
+    {
+      "ja": "GBIF情報",
+      "en": "GBIF Information"
+    },
+    {
+      "ja": "分類学的ランク",
+      "en": "Taxonomic Rank"
+    },
+    {
+      "ja": "正規名",
+      "en": "Canonical Name"
+    },
+    {
+      "ja": "分類学的状態",
+      "en": "Taxonomic Status"
+    },
+    {
+      "ja": "GBIF Key",
+      "en": "GBIF Key"
+    },
+    {
+      "ja": "利用可能なGBIF情報がありません",
+      "en": "No GBIF information available"
+    },
+    {
+      "ja": "最終更新日: ",
+      "en": "Last updated: "
+    },
+    {
+      "ja": "以下の情報はこの日付の版に基づいています。",
+      "en": "The following information is based on the version from this date."
     }
   ]
 }

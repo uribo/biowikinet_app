@@ -5,6 +5,7 @@ library(plotly)
 library(shinyjs)
 library(shinyWidgets)
 library(shiny.i18n)
+library(DT)
 
 ###############
 # input <- NULL
@@ -269,9 +270,10 @@ ui <- bslib::page_fluid(
                        uiOutput("network_stats")
                    )
           ),
-          tabPanel(i18n$t("言語比較"), value = "comparison",
+          tabPanel(i18n$t("GBIF情報"), value = "gbif",
                    div(class="p-3",
-                       plotlyOutput("lang_comparison_plot", height = "400px")
+                       uiOutput("gbif_summary"),
+                       DT::dataTableOutput("gbif_table")
                    )
           )
         )
@@ -288,6 +290,18 @@ server <- function(input, output, session) {
   # 言語切り替えの処理
   observeEvent(input$ui_language, {
     shiny.i18n::update_lang(input$ui_language)
+    
+    # 設定をリセット: Language Editionを現在のUI言語のみに設定
+    updateSelectInput(session, "language_version", selected = input$ui_language)
+    
+    # 選択された分類群をクリア
+    selected_taxa(list())
+    
+    # 選択されたノードIDもクリア
+    selected_node_id(NULL)
+    
+    # 検索ボックスをクリア
+    shiny::updateTextInput(session, "species_search", value = "")
   })
   
   # 検索入力UIを動的に生成
@@ -509,6 +523,17 @@ server <- function(input, output, session) {
     sci_value <- if(!is.na(node_info$sci)) node_info$sci else 0
     
     div(
+      # 最終更新日を上部に表示
+      if (!is.na(node_info$date_modified) && nchar(node_info$date_modified) > 0) {
+        div(class = "alert alert-info mb-3",
+            icon("calendar-alt", class = "me-2"),
+            tags$strong(i18n$t("最終更新日: ")),
+            format(as.Date(node_info$date_modified), "%Y年%m月%d日"),
+            tags$br(),
+            tags$small(i18n$t("以下の情報はこの日付の版に基づいています。"))
+        )
+      },
+      
       div(class = "d-flex mb-3",
         div(class = "node-image-container",
           # プレースホルダー画像 - 実際の画像URLがある場合はここに設定
@@ -686,51 +711,146 @@ server <- function(input, output, session) {
     )
   })
   
-  output$lang_comparison_plot <- plotly::renderPlotly({
-    taxa <- selected_taxa()
+  # GBIF情報のサマリー表示
+  output$gbif_summary <- renderUI({
+    req(selected_node_id())
     
-    if (length(taxa) == 0) {
+    node_info <- nodes |> 
+      dplyr::filter(id == selected_node_id()) |> 
+      dplyr::slice_head(n = 1)
+    
+    if (nrow(node_info) == 0) {
+      return(div(i18n$t("ノード情報が見つかりません")))
+    }
+    
+    # GBIF情報を取得
+    gbif_data <- node_info$gbif[[1]]
+    
+    if (is.null(gbif_data)) {
       return(
-        plotly::plot_ly() |> 
-          plotly::layout(
-            title = i18n$t("分類群を選択してください"),
-            xaxis = list(visible = FALSE),
-            yaxis = list(visible = FALSE)
-          )
+        div(
+          class = "alert alert-info text-center",
+          icon("info-circle", class = "me-2"),
+          i18n$t("利用可能なGBIF情報がありません")
+        )
       )
     }
     
-    lang_stats <- nodes |> 
-      dplyr::filter(
-        stringr::str_extract(id, "(?<=:).*") %in% 
-          stringr::str_extract(names(taxa), "(?<=:).*")
-      ) |> 
-      dplyr::group_by(lang = stringr::str_extract(id, "^[^:]+")) |> 
-      dplyr::summarise(
-        count = dplyr::n(),
-        avg_core = mean(core_index, na.rm = TRUE),
-        avg_sci = mean(sci, na.rm = TRUE),
-        .groups = "drop"
-      ) |> 
-      dplyr::arrange(dplyr::desc(count))
+    # データの形式を確認
+    record_count <- nrow(gbif_data)
     
-    plotly::plot_ly(lang_stats, 
-            y = ~lang, 
-            x = ~count, 
-            type = 'bar', 
-            orientation = 'h',
-            text = ~paste("Count:", count, "<br>Avg Core:", round(avg_core, 2)),
-            textposition = 'none',
-            hoverinfo = 'text',
-            marker = list(color = '#18bc9c')) |> 
-      plotly::layout(
-        title = i18n$t("言語版別の分類群数"),
-        xaxis = list(title = i18n$t("分類群数")),
-        yaxis = list(title = i18n$t("言語"), categoryorder = "total ascending"),
-        showlegend = FALSE,
-        margin = list(l = 50, r = 20, t = 40, b = 40)
-      ) |> 
-      plotly::config(displayModeBar = FALSE)
+    div(
+      tags$h5(i18n$t("GBIF情報"), class = "mb-3"),
+      div(
+        class = "alert alert-success",
+        icon("check-circle", class = "me-2"),
+        sprintf("この分類群には %d 件のGBIF情報があります", record_count)
+      )
+    )
+  })
+  
+  # GBIF情報のテーブル表示
+  output$gbif_table <- DT::renderDataTable({
+    req(selected_node_id())
+    
+    node_info <- nodes |> 
+      dplyr::filter(id == selected_node_id()) |> 
+      dplyr::slice_head(n = 1)
+    
+    if (nrow(node_info) == 0) {
+      return(data.frame())
+    }
+    
+    # GBIF情報を取得
+    gbif_data <- node_info$gbif[[1]]
+    
+    if (is.null(gbif_data)) {
+      return(data.frame())
+    }
+    
+    # データフレームでない場合やレコードがない場合の処理
+    if (!is.data.frame(gbif_data) && !is.list(gbif_data)) {
+      return(data.frame())
+    }
+    
+    # データフレームの列名を日本語と英語で表示するためのマッピング
+    col_mapping <- list(
+      "gbif_id" = "GBIF ID",
+      "canonical_name" = i18n$t("正規名"),
+      "taxon_rank" = i18n$t("分類学的ランク"),
+      "taxonomic_status" = i18n$t("分類学的状態"),
+      "kingdom" = "Kingdom",
+      "phylum" = "Phylum",
+      "class" = "Class",
+      "order" = "Order",
+      "family" = "Family",
+      "genus" = "Genus",
+      "species" = "Species"
+    )
+    
+    # GBIF データの構造を確認してデータフレームに変換
+    if (is.data.frame(gbif_data)) {
+      # 既にデータフレームの場合
+      display_data <- gbif_data |> 
+        dplyr::select(dplyr::any_of(names(col_mapping)))
+    } else {
+      # リスト形式の場合、データフレームに変換
+      # 利用可能な列のみを抽出してデータフレームを作成
+      available_cols <- names(col_mapping)[names(col_mapping) %in% names(gbif_data)]
+      if (length(available_cols) > 0) {
+        # 各列を個別に抽出してデータフレームを作成
+        display_list <- list()
+        for (col in available_cols) {
+          if (!is.null(gbif_data[[col]]) && !all(is.na(gbif_data[[col]]))) {
+            display_list[[col_mapping[[col]]]] <- gbif_data[[col]]
+          }
+        }
+        
+        if (length(display_list) > 0) {
+          # 長さを統一（最長の要素に合わせる）
+          max_length <- max(sapply(display_list, length))
+          display_list <- lapply(display_list, function(x) {
+            if (length(x) < max_length) {
+              c(x, rep(NA, max_length - length(x)))
+            } else {
+              x[1:max_length]
+            }
+          })
+          display_data <- data.frame(display_list, stringsAsFactors = FALSE)
+        } else {
+          display_data <- data.frame()
+        }
+      } else {
+        display_data <- data.frame()
+      }
+    }
+    
+    # GBIF IDがある場合はリンクを作成
+    if ("gbif_id" %in% names(display_data)) {
+      display_data$`GBIF Link` <- sprintf(
+        '<a href="https://www.gbif.org/species/%s" target="_blank">View on GBIF</a>',
+        display_data$gbif_id
+      )
+    }
+    
+    DT::datatable(
+      display_data,
+      options = list(
+        pageLength = 10,
+        scrollX = TRUE,
+        dom = 'tp',
+        language = list(
+          search = i18n$t("検索"),
+          info = "_START_ から _END_ まで（全 _TOTAL_ 件）",
+          paginate = list(
+            previous = "Previous",
+            `next` = "Next"
+          )
+        )
+      ),
+      escape = FALSE,
+      rownames = FALSE
+    )
   })
 }
 
