@@ -1,0 +1,129 @@
+{
+  "languages": ["ja", "en"],
+  "translation": [
+    {
+      "ja": "BioWikiNet",
+      "en": "BioWikiNet"
+    },
+    {
+      "ja": "Explorer",
+      "en": "Explorer"
+    },
+    {
+      "ja": "検索 & フィルター",
+      "en": "Search & Filter"
+    },
+    {
+      "ja": "言語版",
+      "en": "Language Edition"
+    },
+    {
+      "ja": "言語版 (Language Edition)",
+      "en": "Language Edition"
+    },
+    {
+      "ja": "分類群名を検索",
+      "en": "Search taxon"
+    },
+    {
+      "ja": "分類群名を検索 (Search taxon)",
+      "en": "Search taxon"
+    },
+    {
+      "ja": "例: アカガシ、ブナ、ニジマス...",
+      "en": "e.g. Cat, Oak, Beech, ..."
+    },
+    {
+      "ja": "選択された分類群",
+      "en": "Selected Taxa"
+    },
+    {
+      "ja": "分類群が選択されていません",
+      "en": "No taxa selected"
+    },
+    {
+      "ja": "ネットワークを更新",
+      "en": "Update Network"
+    },
+    {
+      "ja": "ネットワーク可視化",
+      "en": "Network Visualization"
+    },
+    {
+      "ja": "詳細情報",
+      "en": "Details"
+    },
+    {
+      "ja": "統計",
+      "en": "Statistics"
+    },
+    {
+      "ja": "言語比較",
+      "en": "Language Comparison"
+    },
+    {
+      "ja": "検索結果がありません",
+      "en": "No search results"
+    },
+    {
+      "ja": "分類群を選択してください",
+      "en": "Please select taxa"
+    },
+    {
+      "ja": "ノード情報が見つかりません",
+      "en": "Node information not found"
+    },
+    {
+      "ja": "この分類群についての説明文は利用できません。",
+      "en": "Description for this taxon is not available."
+    },
+    {
+      "ja": "続きを読む",
+      "en": "Read more"
+    },
+    {
+      "ja": "ネットワーク統計",
+      "en": "Network Statistics"
+    },
+    {
+      "ja": "ノード数:",
+      "en": "Node count:"
+    },
+    {
+      "ja": "エッジ数:",
+      "en": "Edge count:"
+    },
+    {
+      "ja": "選択された分類群:",
+      "en": "Selected taxa:"
+    },
+    {
+      "ja": "表示言語数:",
+      "en": "Display languages:"
+    },
+    {
+      "ja": "言語版別の分類群数",
+      "en": "Taxa Count by Language Edition"
+    },
+    {
+      "ja": "分類群数",
+      "en": "Taxa Count"
+    },
+    {
+      "ja": "言語",
+      "en": "Language"
+    },
+    {
+      "ja": "インターフェース言語",
+      "en": "Interface Language"
+    },
+    {
+      "ja": "日本語",
+      "en": "Japanese"
+    },
+    {
+      "ja": "英語",
+      "en": "English"
+    }
+  ]
+}

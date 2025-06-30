@@ -4,6 +4,7 @@ library(visNetwork)
 library(plotly)
 library(shinyjs)
 library(shinyWidgets)
+library(shiny.i18n)
 
 ###############
 # input <- NULL
@@ -24,10 +25,15 @@ edges <-
   tibble::as_tibble() |> 
   tidyr::unnest(cols = to)
 
+# 翻訳機能の初期化 (明確にjsonファイルを指定する)
+i18n <- shiny.i18n::Translator$new(translation_json_path = here::here("app/translations/translation_ja.json"))
+i18n$set_translation_language("ja")
+
 ui <- bslib::page_fluid(
   fillable = TRUE,
   theme = bslib::bs_theme(version = 5, bootswatch = "minty"),
   shinyjs::useShinyjs(),
+  shiny.i18n::usei18n(i18n),
   tags$head(
     tags$style(HTML("
       html, body, .container-fluid {
@@ -173,11 +179,16 @@ ui <- bslib::page_fluid(
       class = "container-fluid px-3",
       a(class = "navbar-brand d-flex align-items-center", href = "#",
         icon("link", class="text-primary me-2"),
-        tags$h1("BioWikiNet", class="h5 mb-0 fw-bold"),
-        tags$span("Explorer", class="text-muted fw-normal ms-2")
+        tags$h1(i18n$t("BioWikiNet"), class="h5 mb-0 fw-bold"),
+        tags$span(i18n$t("Explorer"), class="text-muted fw-normal ms-2")
       ),
       div(
         class="d-flex align-items-center",
+        selectInput("ui_language", 
+                    label = NULL,
+                    choices = c("日本語" = "ja", "English" = "en"),
+                    selected = "ja",
+                    width = "150px"),
         shiny::actionButton("help_btn", label=NULL, icon=icon("question-circle"), class="btn-light ms-2")
       )
     )
@@ -188,10 +199,10 @@ ui <- bslib::page_fluid(
 
     bslib::card(
       class = "h-100 shadow-sm",
-      bslib::card_header("検索 & フィルター"),
+      bslib::card_header(i18n$t("検索 & フィルター")),
       bslib::card_body(
         selectInput("language_version", 
-                    "言語版 (Language Edition)",
+                    i18n$t("言語版"),
                     choices = list(
                       "English" = "en",
                       "日本語 (Japanese)" = "ja", 
@@ -207,21 +218,19 @@ ui <- bslib::page_fluid(
         
         div(
           class = "position-relative",
-          textInput("species_search", 
-                    label = "分類群名を検索 (Search taxon)",
-                    placeholder = "例: アカガシ、ブナ、ニジマス..."),
+          uiOutput("search_input_ui"),
           uiOutput("search_results")
         ),
         
         tags$hr(),
         
-        tags$h6("選択された分類群", class = "mb-2"),
+        tags$h6(i18n$t("選択された分類群"), class = "mb-2"),
         uiOutput("selected_taxa_list"),
         
         tags$hr(),
         
         actionButton("update_network", 
-                     "ネットワークを更新", 
+                     i18n$t("ネットワークを更新"), 
                      class = "btn-primary w-100 mt-3",
                      icon = icon("refresh"))
       )
@@ -235,7 +244,7 @@ ui <- bslib::page_fluid(
         tags$div(
           id = "network_title",
           class = "h6 mb-0",
-          "ネットワーク可視化"
+          i18n$t("ネットワーク可視化")
         )
       ),
       card_body(
@@ -250,17 +259,17 @@ ui <- bslib::page_fluid(
         padding=0,
         tabsetPanel(
           id = "details_tabs",
-          tabPanel("詳細情報", value = "details",
+          tabPanel(i18n$t("詳細情報"), value = "details",
                    div(class="p-3",
                        uiOutput("selected_node_info")
                    )
           ),
-          tabPanel("統計", value = "metrics",
+          tabPanel(i18n$t("統計"), value = "metrics",
                    div(class="p-3",
                        uiOutput("network_stats")
                    )
           ),
-          tabPanel("言語比較", value = "comparison",
+          tabPanel(i18n$t("言語比較"), value = "comparison",
                    div(class="p-3",
                        plotlyOutput("lang_comparison_plot", height = "400px")
                    )
@@ -275,6 +284,18 @@ server <- function(input, output, session) {
   
   selected_taxa <- reactiveVal(list())
   selected_node_id <- reactiveVal(NULL)
+  
+  # 言語切り替えの処理
+  observeEvent(input$ui_language, {
+    shiny.i18n::update_lang(input$ui_language)
+  })
+  
+  # 検索入力UIを動的に生成
+  output$search_input_ui <- renderUI({
+    textInput("species_search", 
+              label = i18n$t("分類群名を検索"),
+              placeholder = i18n$t("例: アカガシ、ブナ、ニジマス..."))
+  })
  
   .filter_nodes <- function(nodes, langs) {
     nodes |> 
@@ -308,7 +329,7 @@ server <- function(input, output, session) {
       return(
         div(class = "search-results",
             div(class = "search-result-item text-muted",
-                "検索結果がありません")
+                i18n$t("検索結果がありません"))
         )
       )
     }
@@ -367,7 +388,7 @@ server <- function(input, output, session) {
     
     if (length(taxa) == 0) {
       return(
-        div(class = "text-muted small", "分類群が選択されていません")
+        div(class = "text-muted small", i18n$t("分類群が選択されていません"))
       )
     }
     
@@ -436,7 +457,7 @@ server <- function(input, output, session) {
     
     if (nrow(data$nodes) == 0) {
       return(
-        visNetwork(data.frame(id = 1, label = "分類群を選択してください"), 
+        visNetwork(data.frame(id = 1, label = i18n$t("分類群を選択してください")), 
                    data.frame()) |> 
           visOptions(manipulation = FALSE)
       )
@@ -478,7 +499,7 @@ server <- function(input, output, session) {
       dplyr::slice_head(n = 1)
     
     if (nrow(node_info) == 0) {
-      return(div("ノード情報が見つかりません"))
+      return(div(i18n$t("ノード情報が見つかりません")))
     }
     
     # 実際の値を取得（NAの場合はデフォルト値を使用）
@@ -534,15 +555,15 @@ server <- function(input, output, session) {
             },
             tags$br(),
             if(!is.na(node_info$url) && nchar(node_info$url) > 0) {
-              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", "Read more")
+              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", i18n$t("続きを読む"))
           }
           )
         } else {
           div(
-            "この分類群についての説明文は利用できません。",
+            i18n$t("この分類群についての説明文は利用できません。"),
             tags$br(),
             if(!is.na(node_info$url) && nchar(node_info$url) > 0) {
-              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", "Read more")
+              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", i18n$t("続きを読む"))
             }
           )
         }
@@ -641,23 +662,23 @@ server <- function(input, output, session) {
     data <- network_data()
     
     div(
-      tags$h5("ネットワーク統計", class = "mb-3"),
+      tags$h5(i18n$t("ネットワーク統計"), class = "mb-3"),
       tags$table(class = "table table-sm",
         tags$tbody(
           tags$tr(
-            tags$td("ノード数:"),
+            tags$td(i18n$t("ノード数:")),
             tags$td(nrow(data$nodes))
           ),
           tags$tr(
-            tags$td("エッジ数:"),
+            tags$td(i18n$t("エッジ数:")),
             tags$td(nrow(data$edges))
           ),
           tags$tr(
-            tags$td("選択された分類群:"),
+            tags$td(i18n$t("選択された分類群:")),
             tags$td(length(selected_taxa()))
           ),
           tags$tr(
-            tags$td("表示言語数:"),
+            tags$td(i18n$t("表示言語数:")),
             tags$td(length(input$language_version))
           )
         )
@@ -672,7 +693,7 @@ server <- function(input, output, session) {
       return(
         plotly::plot_ly() |> 
           plotly::layout(
-            title = "分類群を選択してください",
+            title = i18n$t("分類群を選択してください"),
             xaxis = list(visible = FALSE),
             yaxis = list(visible = FALSE)
           )
@@ -703,9 +724,9 @@ server <- function(input, output, session) {
             hoverinfo = 'text',
             marker = list(color = '#18bc9c')) |> 
       plotly::layout(
-        title = "言語版別の分類群数",
-        xaxis = list(title = "分類群数"),
-        yaxis = list(title = "言語", categoryorder = "total ascending"),
+        title = i18n$t("言語版別の分類群数"),
+        xaxis = list(title = i18n$t("分類群数")),
+        yaxis = list(title = i18n$t("言語"), categoryorder = "total ascending"),
         showlegend = FALSE,
         margin = list(l = 50, r = 20, t = 40, b = 40)
       ) |> 
