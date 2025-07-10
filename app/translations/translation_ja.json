@@ -1,165 +1,512 @@
 {
-  "languages": ["ja", "en"],
+  "languages": ["en", "ja", "ar", "de", "es", "fr", "hi", "id", "pt", "zh", "ru"],
   "translation": [
     {
+      "en": "BioWikiNet",
       "ja": "BioWikiNet",
-      "en": "BioWikiNet"
+      "ar": "BioWikiNet",
+      "de": "BioWikiNet",
+      "es": "BioWikiNet",
+      "fr": "BioWikiNet",
+      "hi": "BioWikiNet",
+      "id": "BioWikiNet",
+      "pt": "BioWikiNet",
+      "zh": "BioWikiNet",
+      "ru": "BioWikiNet"
     },
     {
+      "en": "Explorer",
       "ja": "Explorer",
-      "en": "Explorer"
+      "ar": "مستكشف",
+      "de": "Explorer",
+      "es": "Explorador",
+      "fr": "Explorateur",
+      "hi": "एक्सप्लोरर",
+      "id": "Penjelajah",
+      "pt": "Explorador",
+      "zh": "浏览器",
+      "ru": "Проводник"
     },
     {
+      "en": "Search",
       "ja": "検索",
-      "en": "Search"
+      "ar": "بحث",
+      "de": "Suche",
+      "es": "Buscar",
+      "fr": "Rechercher",
+      "hi": "खोज",
+      "id": "Cari",
+      "pt": "Pesquisar",
+      "zh": "搜索",
+      "ru": "Поиск"
     },
     {
+      "en": "Search & Filter",
       "ja": "検索 & フィルター",
-      "en": "Search & Filter"
+      "ar": "البحث والتصفية",
+      "de": "Suchen & Filtern",
+      "es": "Buscar y Filtrar",
+      "fr": "Rechercher et Filtrer",
+      "hi": "खोज और फ़िल्टर",
+      "id": "Cari & Filter",
+      "pt": "Pesquisar e Filtrar",
+      "zh": "搜索和筛选",
+      "ru": "Поиск и фильтр"
     },
     {
+      "en": "Language Edition",
       "ja": "言語版",
-      "en": "Language Edition"
+      "ar": "الإصدار اللغوي",
+      "de": "Sprachausgabe",
+      "es": "Edición de idioma",
+      "fr": "Édition linguistique",
+      "hi": "भाषा संस्करण",
+      "id": "Edisi Bahasa",
+      "pt": "Edição de idioma",
+      "zh": "语言版本",
+      "ru": "Языковая версия"
     },
     {
-      "ja": "言語版 (Language Edition)",
-      "en": "Language Edition"
-    },
-    {
+      "en": "Search taxon",
       "ja": "分類群名を検索",
-      "en": "Search taxon"
+      "ar": "البحث عن التصنيف",
+      "de": "Taxon suchen",
+      "es": "Buscar taxón",
+      "fr": "Rechercher un taxon",
+      "hi": "वर्गीकरण खोजें",
+      "id": "Cari takson",
+      "pt": "Pesquisar táxon",
+      "zh": "搜索分类群",
+      "ru": "Поиск таксона"
     },
     {
-      "ja": "分類群名を検索 (Search taxon)",
-      "en": "Search taxon"
+      "en": "e.g. Human, American bison, Sequoia sempervirens ...",
+      "ja": "例: アカガシ, ブナ, ニジマス...",
+      "ar": "مثال: الإنسان، البيسون الأمريكي، سيكويا ...",
+      "de": "z.B. Mensch, Pampasfuchs, Ameisengrillen ...",
+      "es": "ej. Humano, Koenigia, Euhelopodidae ...",
+      "fr": "ex. Humain, Pyroderus, Seomgirincho...",
+      "hi": "जैसे: मनुष्य, अमेरिकी बाइसन, सिकोया ...",
+      "id": "mis. Manusia, Erioderus mimicus, Trupanea simplex ...",
+      "pt": "ex. Humano, Ceroctena, Huberodendron ...",
+      "zh": "例如：人, 冬麻豆属牛, 三角肥腹蛛...",
+      "ru": "напр. Человек, Euryzygoma, Австроцедрус ..."
     },
     {
-      "ja": "例: アカガシ、ブナ、ニジマス...",
-      "en": "e.g. Homo sapiens, American bison, Sequoia sempervirens ..."
-    },
-    {
+      "en": "Selected Taxa",
       "ja": "選択された分類群",
-      "en": "Selected Taxa"
+      "ar": "التصنيفات المحددة",
+      "de": "Ausgewählte Taxa",
+      "es": "Taxones seleccionados",
+      "fr": "Taxons sélectionnés",
+      "hi": "चयनित वर्गीकरण",
+      "id": "Takson Terpilih",
+      "pt": "Táxons selecionados",
+      "zh": "已选择的分类群",
+      "ru": "Выбранные таксоны"
     },
     {
+      "en": "No taxa selected",
       "ja": "分類群が選択されていません",
-      "en": "No taxa selected"
+      "ar": "لم يتم تحديد أي تصنيفات",
+      "de": "Keine Taxa ausgewählt",
+      "es": "No hay taxones seleccionados",
+      "fr": "Aucun taxon sélectionné",
+      "hi": "कोई वर्गीकरण नहीं चुना गया",
+      "id": "Tidak ada takson yang dipilih",
+      "pt": "Nenhum táxon selecionado",
+      "zh": "未选择分类群",
+      "ru": "Таксоны не выбраны"
     },
     {
+      "en": "Update Network",
       "ja": "ネットワークを更新",
-      "en": "Update Network"
+      "ar": "تحديث الشبكة",
+      "de": "Netzwerk aktualisieren",
+      "es": "Actualizar red",
+      "fr": "Mettre à jour le réseau",
+      "hi": "नेटवर्क अपडेट करें",
+      "id": "Perbarui Jaringan",
+      "pt": "Atualizar rede",
+      "zh": "更新网络",
+      "ru": "Обновить сеть"
     },
     {
+      "en": "Network Visualization",
       "ja": "ネットワーク可視化",
-      "en": "Network Visualization"
+      "ar": "تصور الشبكة",
+      "de": "Netzwerkvisualisierung",
+      "es": "Visualización de red",
+      "fr": "Visualisation du réseau",
+      "hi": "नेटवर्क विज़ुअलाइज़ेशन",
+      "id": "Visualisasi Jaringan",
+      "pt": "Visualização de rede",
+      "zh": "网络可视化",
+      "ru": "Визуализация сети"
     },
     {
+      "en": "Details",
       "ja": "詳細情報",
-      "en": "Details"
+      "ar": "التفاصيل",
+      "de": "Details",
+      "es": "Detalles",
+      "fr": "Détails",
+      "hi": "विवरण",
+      "id": "Detail",
+      "pt": "Detalhes",
+      "zh": "详细信息",
+      "ru": "Подробности"
     },
     {
+      "en": "Statistics",
       "ja": "統計",
-      "en": "Statistics"
+      "ar": "الإحصائيات",
+      "de": "Statistiken",
+      "es": "Estadísticas",
+      "fr": "Statistiques",
+      "hi": "सांख्यिकी",
+      "id": "Statistik",
+      "pt": "Estatísticas",
+      "zh": "统计",
+      "ru": "Статистика"
     },
     {
+      "en": "Language Comparison",
       "ja": "言語比較",
-      "en": "Language Comparison"
+      "ar": "مقارنة اللغات",
+      "de": "Sprachvergleich",
+      "es": "Comparación de idiomas",
+      "fr": "Comparaison des langues",
+      "hi": "भाषा तुलना",
+      "id": "Perbandingan Bahasa",
+      "pt": "Comparação de idiomas",
+      "zh": "语言比较",
+      "ru": "Сравнение языков"
     },
     {
+      "en": "No search results",
       "ja": "検索結果がありません",
-      "en": "No search results"
+      "ar": "لا توجد نتائج بحث",
+      "de": "Keine Suchergebnisse",
+      "es": "Sin resultados de búsqueda",
+      "fr": "Aucun résultat de recherche",
+      "hi": "कोई खोज परिणाम नहीं",
+      "id": "Tidak ada hasil pencarian",
+      "pt": "Sem resultados de pesquisa",
+      "zh": "没有搜索结果",
+      "ru": "Нет результатов поиска"
     },
     {
+      "en": "Please select taxa",
       "ja": "分類群を選択してください",
-      "en": "Please select taxa"
+      "ar": "يرجى تحديد التصنيفات",
+      "de": "Bitte wählen Sie Taxa aus",
+      "es": "Por favor seleccione taxones",
+      "fr": "Veuillez sélectionner des taxons",
+      "hi": "कृपया वर्गीकरण चुनें",
+      "id": "Silakan pilih takson",
+      "pt": "Por favor selecione táxons",
+      "zh": "请选择分类群",
+      "ru": "Пожалуйста, выберите таксоны"
     },
     {
+      "en": "Node information not found",
       "ja": "ノード情報が見つかりません",
-      "en": "Node information not found"
+      "ar": "لم يتم العثور على معلومات العقدة",
+      "de": "Knoteninformationen nicht gefunden",
+      "es": "Información del nodo no encontrada",
+      "fr": "Informations du nœud introuvables",
+      "hi": "नोड जानकारी नहीं मिली",
+      "id": "Informasi node tidak ditemukan",
+      "pt": "Informação do nó não encontrada",
+      "zh": "未找到节点信息",
+      "ru": "Информация об узле не найдена"
     },
     {
+      "en": "Description for this taxon is not available.",
       "ja": "この分類群についての説明文は利用できません。",
-      "en": "Description for this taxon is not available."
+      "ar": "الوصف لهذا التصنيف غير متوفر.",
+      "de": "Beschreibung für dieses Taxon ist nicht verfügbar.",
+      "es": "La descripción de este taxón no está disponible.",
+      "fr": "La description de ce taxon n'est pas disponible.",
+      "hi": "इस वर्गीकरण के लिए विवरण उपलब्ध नहीं है।",
+      "id": "Deskripsi untuk takson ini tidak tersedia.",
+      "pt": "Descrição para este táxon não está disponível.",
+      "zh": "此分类群的描述不可用。",
+      "ru": "Описание для этого таксона недоступно."
     },
     {
+      "en": "Read more",
       "ja": "続きを読む",
-      "en": "Read more"
+      "ar": "اقرأ المزيد",
+      "de": "Mehr lesen",
+      "es": "Leer más",
+      "fr": "Lire la suite",
+      "hi": "और पढ़ें",
+      "id": "Baca selengkapnya",
+      "pt": "Ler mais",
+      "zh": "阅读更多",
+      "ru": "Читать далее"
     },
     {
+      "en": "Network Statistics",
       "ja": "ネットワーク統計",
-      "en": "Network Statistics"
+      "ar": "إحصائيات الشبكة",
+      "de": "Netzwerkstatistiken",
+      "es": "Estadísticas de red",
+      "fr": "Statistiques du réseau",
+      "hi": "नेटवर्क सांख्यिकी",
+      "id": "Statistik Jaringan",
+      "pt": "Estatísticas de rede",
+      "zh": "网络统计",
+      "ru": "Статистика сети"
     },
     {
+      "en": "Node count:",
       "ja": "ノード数:",
-      "en": "Node count:"
+      "ar": "عدد العقد:",
+      "de": "Knotenanzahl:",
+      "es": "Número de nodos:",
+      "fr": "Nombre de nœuds:",
+      "hi": "नोड संख्या:",
+      "id": "Jumlah node:",
+      "pt": "Número de nós:",
+      "zh": "节点数：",
+      "ru": "Количество узлов:"
     },
     {
+      "en": "Edge count:",
       "ja": "エッジ数:",
-      "en": "Edge count:"
+      "ar": "عدد الحواف:",
+      "de": "Kantenanzahl:",
+      "es": "Número de aristas:",
+      "fr": "Nombre d'arêtes:",
+      "hi": "एज संख्या:",
+      "id": "Jumlah tepi:",
+      "pt": "Número de arestas:",
+      "zh": "边数：",
+      "ru": "Количество рёбер:"
     },
     {
+      "en": "Selected taxa:",
       "ja": "選択された分類群:",
-      "en": "Selected taxa:"
+      "ar": "التصنيفات المحددة:",
+      "de": "Ausgewählte Taxa:",
+      "es": "Taxones seleccionados:",
+      "fr": "Taxons sélectionnés:",
+      "hi": "चयनित वर्गीकरण:",
+      "id": "Takson terpilih:",
+      "pt": "Táxons selecionados:",
+      "zh": "已选择的分类群：",
+      "ru": "Выбранные таксоны:"
     },
     {
+      "en": "Display languages:",
       "ja": "表示言語数:",
-      "en": "Display languages:"
+      "ar": "عرض اللغات:",
+      "de": "Anzeigesprachen:",
+      "es": "Idiomas mostrados:",
+      "fr": "Langues affichées:",
+      "hi": "प्रदर्शन भाषाएं:",
+      "id": "Bahasa tampilan:",
+      "pt": "Idiomas exibidos:",
+      "zh": "显示语言：",
+      "ru": "Отображаемые языки:"
     },
     {
+      "en": "Taxa Count by Language Edition",
       "ja": "言語版別の分類群数",
-      "en": "Taxa Count by Language Edition"
+      "ar": "عدد التصنيفات حسب الإصدار اللغوي",
+      "de": "Taxa-Anzahl nach Sprachausgabe",
+      "es": "Recuento de taxones por edición de idioma",
+      "fr": "Nombre de taxons par édition linguistique",
+      "hi": "भाषा संस्करण के अनुसार वर्गीकरण संख्या",
+      "id": "Jumlah Takson berdasarkan Edisi Bahasa",
+      "pt": "Contagem de táxons por edição de idioma",
+      "zh": "按语言版本分类群数量",
+      "ru": "Количество таксонов по языковым версиям"
     },
     {
+      "en": "Taxa Count",
       "ja": "分類群数",
-      "en": "Taxa Count"
+      "ar": "عدد التصنيفات",
+      "de": "Taxa-Anzahl",
+      "es": "Recuento de taxones",
+      "fr": "Nombre de taxons",
+      "hi": "वर्गीकरण संख्या",
+      "id": "Jumlah Takson",
+      "pt": "Contagem de táxons",
+      "zh": "分类群数量",
+      "ru": "Количество таксонов"
     },
     {
+      "en": "Taxonomic Level",
+      "ja": "分類階層",
+      "ar": "المستوى التصنيفي",
+      "de": "Taxonomische Ebene",
+      "es": "Nivel taxonómico",
+      "fr": "Niveau taxonomique",
+      "hi": "वर्गीकरण स्तर",
+      "id": "Tingkat Taksonomi",
+      "pt": "Nível taxonômico",
+      "zh": "分类层级",
+      "ru": "Таксономический уровень"
+    },
+    {
+      "en": "Language",
       "ja": "言語",
-      "en": "Language"
+      "ar": "اللغة",
+      "de": "Sprache",
+      "es": "Idioma",
+      "fr": "Langue",
+      "hi": "भाषा",
+      "id": "Bahasa",
+      "pt": "Idioma",
+      "zh": "语言",
+      "ru": "Язык"
     },
     {
+      "en": "Interface Language",
       "ja": "インターフェース言語",
-      "en": "Interface Language"
+      "ar": "لغة الواجهة",
+      "de": "Schnittstellensprache",
+      "es": "Idioma de la interfaz",
+      "fr": "Langue de l'interface",
+      "hi": "इंटरफ़ेस भाषा",
+      "id": "Bahasa Antarmuka",
+      "pt": "Idioma da interface",
+      "zh": "界面语言",
+      "ru": "Язык интерфейса"
     },
     {
+      "en": "Japanese",
       "ja": "日本語",
-      "en": "Japanese"
+      "ar": "اليابانية",
+      "de": "Japanisch",
+      "es": "Japonés",
+      "fr": "Japonais",
+      "hi": "जापानी",
+      "id": "Bahasa Jepang",
+      "pt": "Japonês",
+      "zh": "日语",
+      "ru": "Японский"
     },
     {
+      "en": "English",
       "ja": "英語",
-      "en": "English"
+      "ar": "الإنجليزية",
+      "de": "Englisch",
+      "es": "Inglés",
+      "fr": "Anglais",
+      "hi": "अंग्रेज़ी",
+      "id": "Bahasa Inggris",
+      "pt": "Inglês",
+      "zh": "英语",
+      "ru": "Английский"
     },
     {
+      "en": "GBIF Information",
       "ja": "GBIF情報",
-      "en": "GBIF Information"
+      "ar": "معلومات GBIF",
+      "de": "GBIF-Informationen",
+      "es": "Información GBIF",
+      "fr": "Informations GBIF",
+      "hi": "GBIF जानकारी",
+      "id": "Informasi GBIF",
+      "pt": "Informação GBIF",
+      "zh": "GBIF信息",
+      "ru": "Информация GBIF"
     },
     {
+      "en": "Taxonomic Rank",
       "ja": "分類学的ランク",
-      "en": "Taxonomic Rank"
+      "ar": "الرتبة التصنيفية",
+      "de": "Taxonomischer Rang",
+      "es": "Rango taxonómico",
+      "fr": "Rang taxonomique",
+      "hi": "वर्गीकरण रैंक",
+      "id": "Peringkat Taksonomi",
+      "pt": "Classificação taxonômica",
+      "zh": "分类学等级",
+      "ru": "Таксономический ранг"
     },
     {
-      "ja": "正規名",
-      "en": "Canonical Name"
+      "en": "Canonical Name",
+      "ja": "学名",
+      "ar": "الاسم القانوني",
+      "de": "Kanonischer Name",
+      "es": "Nombre canónico",
+      "fr": "Nom canonique",
+      "hi": "मानक नाम",
+      "id": "Nama Kanonik",
+      "pt": "Nome canônico",
+      "zh": "规范名称",
+      "ru": "Каноническое название"
     },
     {
+      "en": "Taxonomic Status",
       "ja": "分類学的状態",
-      "en": "Taxonomic Status"
+      "ar": "الحالة التصنيفية",
+      "de": "Taxonomischer Status",
+      "es": "Estado taxonómico",
+      "fr": "Statut taxonomique",
+      "hi": "वर्गीकरण स्थिति",
+      "id": "Status Taksonomi",
+      "pt": "Status taxonômico",
+      "zh": "分类学状态",
+      "ru": "Таксономический статус"
     },
     {
+      "en": "GBIF Key",
       "ja": "GBIF Key",
-      "en": "GBIF Key"
+      "ar": "مفتاح GBIF",
+      "de": "GBIF-Schlüssel",
+      "es": "Clave GBIF",
+      "fr": "Clé GBIF",
+      "hi": "GBIF कुंजी",
+      "id": "Kunci GBIF",
+      "pt": "Chave GBIF",
+      "zh": "GBIF密钥",
+      "ru": "Ключ GBIF"
     },
     {
+      "en": "No GBIF information available",
       "ja": "利用可能なGBIF情報がありません",
-      "en": "No GBIF information available"
+      "ar": "لا تتوفر معلومات GBIF",
+      "de": "Keine GBIF-Informationen verfügbar",
+      "es": "No hay información GBIF disponible",
+      "fr": "Aucune information GBIF disponible",
+      "hi": "कोई GBIF जानकारी उपलब्ध नहीं",
+      "id": "Tidak ada informasi GBIF yang tersedia",
+      "pt": "Nenhuma informação GBIF disponível",
+      "zh": "没有可用的GBIF信息",
+      "ru": "Информация GBIF недоступна"
     },
     {
+      "en": "Last updated: ",
       "ja": "最終更新日: ",
-      "en": "Last updated: "
+      "ar": "آخر تحديث: ",
+      "de": "Zuletzt aktualisiert: ",
+      "es": "Última actualización: ",
+      "fr": "Dernière mise à jour: ",
+      "hi": "अंतिम अपडेट: ",
+      "id": "Terakhir diperbarui: ",
+      "pt": "Última atualização: ",
+      "zh": "最后更新：",
+      "ru": "Последнее обновление: "
     },
     {
-      "ja": "以下の情報はこの日付の版に基づいています。",
-      "en": "The following information is based on the version from this date."
+      "en": "The information displayed here is based on the version of this date.",
+      "ja": "ここに表示される情報はこの日付の版に基づいています。",
+      "ar": "تستند المعلومات المعروضة هنا إلى إصدار هذا التاريخ.",
+      "de": "Die hier angezeigten Informationen basieren auf der Version dieses Datums.",
+      "es": "La información mostrada aquí se basa en la versión de esta fecha.",
+      "fr": "Les informations affichées ici sont basées sur la version de cette date.",
+      "hi": "यहाँ प्रदर्शित जानकारी इस तिथि के संस्करण पर आधारित है।",
+      "id": "Informasi yang ditampilkan di sini didasarkan pada versi tanggal ini.",
+      "pt": "As informações exibidas aqui são baseadas na versão desta data.",
+      "zh": "此处显示的信息基于此日期的版本。",
+      "ru": "Отображаемая здесь информация основана на версии этой даты."
     }
   ]
 }

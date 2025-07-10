@@ -1,0 +1,7 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+taxon_absent_count|function|24fcb78b93085164
+read_gbif_backbone_taxon_tsv|function|6cf2f9a2913074ed
+taxonomy_count|function|ec4d165813e9c8d7
+nodes|stem|60b5a5c9c69f9a0b|92df3f09c9641c8a|2c530c1562a7fbd1|1923685423||t20279.2774100825s|s193354100b|193354100|rds|local|vector|||83.674||
+edges|stem|d07bc842091732d6|afb29e900f22843d|2c530c1562a7fbd1|547770317||t20279.2777781844s|s56558466b|56558466|rds|local|vector|||24.137||
+df_gbif|stem|50e0a8f5b850f24d|cfa307146439430f|c158294eeae0caf6|1230067174||t20279.2782503219s|s57753038b|57753038|rds|local|vector|||33.205||

@@ -6,29 +6,13 @@ library(shinyjs)
 library(shinyWidgets)
 library(shiny.i18n)
 library(DT)
+library(dplyr)
 
-###############
-# input <- NULL
-# input$language_version <- "ja"
-# input$species_search <- "アカガシ"
-# d <- .filter_nodes(nodes, lang = input$language_version)
-# d |> 
-#   dplyr::filter(
-#         stringr::str_detect(label, stringr::regex(input$species_search, ignore_case = TRUE)))
-###############
-
-nodes <-
-  jsonlite::fromJSON(here::here("data-raw/nodes.json")) |> 
-  tibble::as_tibble()
-
-edges <-
-  jsonlite::fromJSON(here::here("data-raw/edges.json")) |> 
-  tibble::as_tibble() |> 
-  tidyr::unnest(cols = to)
+targets::tar_load(names = c(df_gbif, edges, nodes))
 
 # 翻訳機能の初期化 (明確にjsonファイルを指定する)
 i18n <- shiny.i18n::Translator$new(translation_json_path = here::here("app/translations/translation_ja.json"))
-i18n$set_translation_language("ja")
+i18n$set_translation_language("en")
 
 ui <- bslib::page_fluid(
   fillable = TRUE,
@@ -54,30 +38,58 @@ ui <- bslib::page_fluid(
         border-color: #18bc9c;
       }
       .bslib-layout-columns {
-        height: calc(100vh - 58px);
+        height: calc(100vh - 58px - 50px);
         padding: 0.5rem;
         gap: 0.5rem;
+      }
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background-color: #2c3e50;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-top: 1px solid #34495e;
+        z-index: 1000;
+        font-size: 0.9rem;
+      }
+      .footer a {
+        color: #18bc9c;
+        text-decoration: none;
+        margin: 0 10px;
+      }
+      .footer a:hover {
+        color: #1dd9a8;
+        text-decoration: underline;
+      }
+      .footer-divider {
+        margin: 0 15px;
+        color: #7f8c8d;
       }
       .metric-card {
         background-color: #f77e7e;
         color: white;
         border-radius: 0.5rem;
-        padding: 1.5rem;
+        padding: 0.5rem;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
       .metric-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+        margin-bottom: 0.2rem;
       }
       .metric-value {
-        font-size: 2rem;
+        font-size: 1.2rem;
         font-weight: 700;
-        margin: 0.5rem 0;
+        margin: 0.2rem 0;
       }
       .metric-label {
-        font-size: 1rem;
+        font-size: 0.8rem;
         opacity: 0.9;
       }
       .node-header {
@@ -185,12 +197,27 @@ ui <- bslib::page_fluid(
       ),
       div(
         class="d-flex align-items-center",
-        selectInput("ui_language", 
+        selectInput("ui_language",
                     label = NULL,
-                    choices = c("日本語" = "ja", "English" = "en"),
-                    selected = "ja",
+                    choices = c(
+                      "English" = "en",
+                      "日本語" = "ja",
+                      "العربية" = "ar",
+                      "Deutsch" = "de",
+                      "Español" = "es",
+                      "Français" = "fr",
+                      "हिन्दी" = "hi",
+                      "Bahasa Indonesia" = "id",
+                      "Português" = "pt",
+                      "中文" = "zh",
+                      "Русский" = "ru"),
+                    selected = "en",
                     width = "150px"),
-        shiny::actionButton("help_btn", label=NULL, icon=icon("question-circle"), class="btn-light ms-2")
+        shiny::actionButton(
+          "help_btn",
+          label = NULL,
+          icon = icon("question-circle"),
+          class = "btn-light ms-2")
       )
     )
   ),
@@ -200,38 +227,49 @@ ui <- bslib::page_fluid(
 
     bslib::card(
       class = "h-100 shadow-sm",
-      bslib::card_header(i18n$t("検索 & フィルター")),
+      bslib::card_header(i18n$t("Search & Filter")),
       bslib::card_body(
-        selectInput("language_version", 
-                    i18n$t("言語版"),
+        selectInput("language_version",
+                    i18n$t("Language Edition"),
                     choices = list(
+                      "العربية" = "ar",
+                      "Deutsch (German)" = "de",
                       "English" = "en",
-                      "日本語 (Japanese)" = "ja", 
                       "Español (Spanish)" = "es",
                       "Français (French)" = "fr",
-                      "Deutsch (German)" = "de",
+                      "हिन्दी" = "hi",
+                      "Bahasa Indonesia" = "id",
+                      "日本語 (Japanese)" = "ja",
                       "中文 (Chinese)" = "zh",
                       "Português (Portuguese)" = "pt",
                       "Русский (Russian)" = "ru"
                     ),
-                    selected = "ja",
+                    selected = "en",
                     multiple = TRUE),
-        
+
         div(
           class = "position-relative",
           uiOutput("search_input_ui"),
           uiOutput("search_results")
         ),
-        
+
         tags$hr(),
-        
-        tags$h6(i18n$t("選択された分類群"), class = "mb-2"),
+
+        div(class = "alert alert-info mb-3",
+            icon("calendar-alt", class = "me-2"),
+            tags$strong(i18n$t("Last updated: ")),
+            format(as.Date("2024-12-31"), "%Y-%m-%d-"),
+            tags$br(),
+            tags$small(i18n$t("The information displayed here is based on the version of this date."))
+        ),
+
+        tags$h6(i18n$t("Selected Taxa"), class = "mb-2"),
         uiOutput("selected_taxa_list"),
-        
+
         tags$hr(),
-        
-        actionButton("update_network", 
-                     i18n$t("ネットワークを更新"), 
+
+        actionButton("update_network",
+                     i18n$t("Update Network"),
                      class = "btn-primary w-100 mt-3",
                      icon = icon("refresh"))
       )
@@ -245,7 +283,7 @@ ui <- bslib::page_fluid(
         tags$div(
           id = "network_title",
           class = "h6 mb-0",
-          i18n$t("ネットワーク可視化")
+          i18n$t("Network Visualization")
         )
       ),
       card_body(
@@ -260,17 +298,17 @@ ui <- bslib::page_fluid(
         padding=0,
         tabsetPanel(
           id = "details_tabs",
-          tabPanel(i18n$t("詳細情報"), value = "details",
+          tabPanel(i18n$t("Details"), value = "details",
                    div(class="p-3",
                        uiOutput("selected_node_info")
                    )
           ),
-          tabPanel(i18n$t("統計"), value = "metrics",
+          tabPanel(i18n$t("Statistics"), value = "metrics",
                    div(class="p-3",
                        uiOutput("network_stats")
                    )
           ),
-          tabPanel(i18n$t("GBIF情報"), value = "gbif",
+          tabPanel(i18n$t("GBIF Information"), value = "gbif",
                    div(class="p-3",
                        uiOutput("gbif_summary"),
                        DT::dataTableOutput("gbif_table")
@@ -279,75 +317,101 @@ ui <- bslib::page_fluid(
         )
       )
     )
+  ),
+
+  tags$footer(
+    class = "footer",
+    div(
+      tags$span("© 2025 BioWikiNet"),
+      tags$span(class = "footer-divider", "|"),
+      tags$a(href = "https://github.com/uribo/biowikinet_app", target = "_blank",
+             icon("github"), " GitHub"),
+      tags$span(class = "footer-divider", "|"),
+      tags$a(href = "#", onclick = "alert('BioWikiNet v1.0.0')",
+             icon("info-circle"), " About"),
+      tags$span(class = "footer-divider", "|"),
+      tags$a(href = "https://x.com/u_ribo",
+             icon("x-twitter"), " Contact"),
+      tags$span(class = "footer-divider", "|"),
+      tags$span(icon("database"), " Data: "),
+      tags$a(href = "https://doi.org/10.6084/m9.figshare.29431577.v2", 
+             target = "_blank",
+             "Uryu (2025)")
+    )
   )
 )
 
 server <- function(input, output, session) {
-  
-  selected_taxa <- reactiveVal(list())
-  selected_node_id <- reactiveVal(NULL)
-  
+
+  selected_taxa <- shiny::reactiveVal(list())
+  selected_node_id <- shiny::reactiveVal(NULL)
+
   # 言語切り替えの処理
-  observeEvent(input$ui_language, {
+  shiny::observeEvent(input$ui_language, {
     shiny.i18n::update_lang(input$ui_language)
-    
+
     # 設定をリセット: Language Editionを現在のUI言語のみに設定
-    updateSelectInput(session, "language_version", selected = input$ui_language)
-    
+    shiny::updateSelectInput(session, "language_version", selected = input$ui_language)
+
     # 選択された分類群をクリア
     selected_taxa(list())
-    
+
     # 選択されたノードIDもクリア
     selected_node_id(NULL)
-    
+
     # 検索ボックスをクリア
     shiny::updateTextInput(session, "species_search", value = "")
   })
-  
+
   # 検索入力UIを動的に生成
-  output$search_input_ui <- renderUI({
-    textInput("species_search", 
-              label = i18n$t("分類群名を検索"),
-              placeholder = i18n$t("例: アカガシ、ブナ、ニジマス..."))
+  output$search_input_ui <- shiny::renderUI({
+    shiny::textInput("species_search",
+              label = i18n$t("Search taxon"),
+              placeholder = i18n$t("e.g. Human, American bison, Sequoia sempervirens ..."))
   })
- 
+
   .filter_nodes <- function(nodes, langs) {
-    nodes |> 
+    nodes |>
       dplyr::filter(
         stringr::str_detect(id, paste0("^(", paste(langs, collapse = "|"), "):"))
-      ) |> 
-      dplyr::filter(!is.na(name))
+      ) |>
+      dplyr::filter(!is.na(label))
   }
 
-  filtered_nodes <- reactive({
+  filtered_nodes <- shiny::reactive({
     req(input$language_version)
     .filter_nodes(nodes, input$language_version)
   })
-  
-  output$search_results <- renderUI({
+
+  output$search_results <- shiny::renderUI({
     req(input$species_search)
-    
+
     if (nchar(input$species_search) < 2) {
       return(NULL)
     }
-    
+
     search_term <- input$species_search
-    
-    matching_nodes <- 
-      filtered_nodes() |> 
+
+    matching_nodes <-
+      filtered_nodes() |>
       dplyr::filter(
-        stringr::str_detect(label, stringr::regex(search_term, ignore_case = TRUE))
+        stringr::str_detect(label,
+          stringr::str_c("^",
+          stringr::regex(search_term, ignore_case = TRUE),
+          "$", sep = ""
+        )
+          )
       )
-    
+
     if (nrow(matching_nodes) == 0) {
       return(
         div(class = "search-results",
             div(class = "search-result-item text-muted",
-                i18n$t("検索結果がありません"))
+                i18n$t("No search results"))
         )
       )
     }
-    
+
     div(
       class = "search-results",
       lapply(seq_len(nrow(matching_nodes)), function(i) {
@@ -356,25 +420,25 @@ server <- function(input, output, session) {
           class = "search-result-item",
           onclick = sprintf("Shiny.setInputValue('add_taxon', '%s', {priority: 'event'})", node$id),
           tags$strong(node$label),
-          tags$small(class = "text-muted ms-2", 
-                     sprintf("(%s%s)", 
+          tags$small(class = "text-muted ms-2",
+                     sprintf("(%s%s)",
                              stringr::str_extract(node$id, "^[^:]+"),
-                             if(!is.na(node$core_index) && node$core_index > 0) 
-                               paste0(", Core: ", round(node$core_index, 1)) 
+                             if(!is.na(node$core_index) && node$core_index > 0)
+                               paste0(", Core: ", round(node$core_index, 1))
                              else ""))
         )
       })
     )
   })
-  
-  observeEvent(input$add_taxon, {
-    node_info <- nodes |> 
-      dplyr::filter(id == input$add_taxon) |> 
+
+  shiny::observeEvent(input$add_taxon, {
+    node_info <- nodes |>
+      dplyr::filter(id == input$add_taxon) |>
       dplyr::slice_head(n = 1)
-    
+
     if (nrow(node_info) > 0) {
       current_taxa <- selected_taxa()
-      
+
       if (!input$add_taxon %in% names(current_taxa)) {
         current_taxa[[input$add_taxon]] <- list(
           id = node_info$id,
@@ -382,30 +446,30 @@ server <- function(input, output, session) {
         )
         selected_taxa(current_taxa)
       }
-      
+
       # 選択したノードの詳細情報を表示
       selected_node_id(input$add_taxon)
-      
+
       # ネットワーク内のノードを選択状態にする
       # 少し遅延を入れてネットワークが更新されるのを待つ
       shinyjs::delay(500, {
-        visNetwork::visNetworkProxy("network_view") |> 
+        visNetwork::visNetworkProxy("network_view") |>
           visNetwork::visSelectNodes(id = input$add_taxon)
       })
     }
-    
+
     shiny::updateTextInput(session, "species_search", value = "")
   })
-  
+
   output$selected_taxa_list <- shiny::renderUI({
     taxa <- selected_taxa()
-    
+
     if (length(taxa) == 0) {
       return(
-        div(class = "text-muted small", i18n$t("分類群が選択されていません"))
+        div(class = "text-muted small", i18n$t("No taxa selected"))
       )
     }
-    
+
     div(
       lapply(names(taxa), function(taxon_id) {
         div(
@@ -422,36 +486,37 @@ server <- function(input, output, session) {
       })
     )
   })
-  
-  observeEvent(input$remove_taxon, {
+
+  shiny::observeEvent(input$remove_taxon, {
     current_taxa <- selected_taxa()
     current_taxa[[input$remove_taxon]] <- NULL
     selected_taxa(current_taxa)
   })
-  
-  network_data <- reactive({
+
+  network_data <- shiny::reactive({
     taxa <- selected_taxa()
-    
+
     if (length(taxa) == 0) {
       return(list(nodes = data.frame(), edges = data.frame()))
     }
-    
+
     target_ids <- names(taxa)
-    
-    selected_edges <- 
-      edges |> 
+
+    selected_edges <-
+      edges |>
       dplyr::filter(
         from %in% target_ids | to %in% target_ids,
         stringr::str_detect(from, paste0("^(", paste(input$language_version, collapse = "|"), "):")),
         stringr::str_detect(to, paste0("^(", paste(input$language_version, collapse = "|"), "):"))
       )
-    
-    all_node_ids <- unique(c(selected_edges$from, selected_edges$to, target_ids))
-    
-    selected_nodes <- nodes |> 
+
+    all_node_ids <-
+      unique(c(selected_edges$from, selected_edges$to, target_ids))
+
+    selected_nodes <- nodes |>
       dplyr::filter(id %in% all_node_ids)
-    
-    selected_nodes <- selected_nodes |> 
+
+    selected_nodes <- selected_nodes |>
       dplyr::mutate(
         color = dplyr::case_when(
           id %in% target_ids ~ "#e74c3c",
@@ -462,78 +527,74 @@ server <- function(input, output, session) {
           TRUE ~ 20
         )
       )
-    
+
     list(nodes = selected_nodes, edges = selected_edges)
   })
-  
-  output$network_view <- renderVisNetwork({
+
+  output$network_view <- visNetwork::renderVisNetwork({
     data <- network_data()
-    
+
     if (nrow(data$nodes) == 0) {
       return(
-        visNetwork(data.frame(id = 1, label = i18n$t("分類群を選択してください")), 
-                   data.frame()) |> 
+        visNetwork(data.frame(id = 1, label = i18n$t("Please select taxa")),
+                   data.frame()) |>
           visOptions(manipulation = FALSE)
       )
     }
-    
-    visNetwork(data$nodes, data$edges) |> 
+
+    visNetwork(data$nodes, data$edges) |>
       visOptions(
         highlightNearest = list(enabled = TRUE, degree = 1, hover = TRUE),
         nodesIdSelection = list(enabled = TRUE, style = 'width: 200px; height: 26px;')
-      ) |> 
+      ) |>
       visPhysics(
-        solver = "forceAtlas2Based", 
+        solver = "forceAtlas2Based",
         forceAtlas2Based = list(
           gravitationalConstant = -50,
           centralGravity = 0.01,
           springLength = 100,
           springConstant = 0.08
         )
-      ) |> 
+      ) |>
       visEvents(select = "function(nodes) {
         Shiny.setInputValue('selected_node', nodes.nodes[0]);
       }")
   })
-  
-  observeEvent(input$selected_node, {
+
+  shiny::observeEvent(input$selected_node, {
     selected_node_id(input$selected_node)
   })
-  
+
   shiny::observeEvent(input$update_network, {
-    visNetworkProxy("network_view") |> 
+    visNetworkProxy("network_view") |>
       visRedraw()
   })
-  
-  output$selected_node_info <- renderUI({
+
+  output$selected_node_info <- shiny::renderUI({
     req(selected_node_id())
-    
-    node_info <- nodes |> 
-      dplyr::filter(id == selected_node_id()) |> 
+
+    node_info <-
+      nodes |>
+      dplyr::filter(id == selected_node_id()) |>
       dplyr::slice_head(n = 1)
-    
+
     if (nrow(node_info) == 0) {
-      return(div(i18n$t("ノード情報が見つかりません")))
+      return(div(i18n$t("Node information not found")))
     }
-    
+
+    node_info <-
+      node_info |>
+      tidyr::unnest(cols = gbif) |>
+      dplyr::left_join(df_gbif,
+                        by = dplyr::join_by(gbif_id))
+
     # 実際の値を取得（NAの場合はデフォルト値を使用）
     pageviews <- if(!is.na(node_info$pageviews)) node_info$pageviews else 0
     edit_count <- if(!is.na(node_info$edit_count)) node_info$edit_count else 0
     core_index <- if(!is.na(node_info$core_index)) node_info$core_index else 0
     sci_value <- if(!is.na(node_info$sci)) node_info$sci else 0
-    
+
     div(
-      # 最終更新日を上部に表示
-      if (!is.na(node_info$date_modified) && nchar(node_info$date_modified) > 0) {
-        div(class = "alert alert-info mb-3",
-            icon("calendar-alt", class = "me-2"),
-            tags$strong(i18n$t("最終更新日: ")),
-            format(as.Date(node_info$date_modified), "%Y年%m月%d日"),
-            tags$br(),
-            tags$small(i18n$t("以下の情報はこの日付の版に基づいています。"))
-        )
-      },
-      
       div(class = "d-flex mb-3",
         div(class = "node-image-container",
           # プレースホルダー画像 - 実際の画像URLがある場合はここに設定
@@ -545,28 +606,50 @@ server <- function(input, output, session) {
         ),
         div(class = "flex-grow-1",
           div(class = "node-header",
-            if(!is.na(node_info$gbif[[1]]$taxon_rank) && nchar(node_info$gbif[[1]]$taxon_rank) > 0) {
-              rank_class <- if(node_info$gbif[[1]]$taxon_rank %in% c("kingdom", "phylum", "class", "order", "family", "genus", "species")) {
-                paste("node-taxonomy", node_info$gbif[[1]]$taxon_rank)
+            if(!is.na(node_info$taxon_rank[1]) && nchar(node_info$taxon_rank[1]) > 0) {
+              rank_class <- if(node_info$taxon_rank[1] %in% c("kingdom", "phylum", "class", "order", "family", "genus", "species")) {
+                paste("node-taxonomy", node_info$taxon_rank[1])
               } else {
                 "node-taxonomy other"
               }
-              div(class = rank_class, node_info$gbif[[1]]$taxon_rank)
+              div(class = rank_class, node_info$taxon_rank[1])
             },
             tags$h4(node_info$label, class = "mb-1"),
-            tags$div(class = "text-muted", 
-                     if(!is.na(node_info$gbif[[1]]$canonical_name) && nchar(node_info$gbif[[1]]$canonical_name) > 0) {
-                       tags$em(node_info$gbif[[1]]$canonical_name)
+            tags$div(class = "text-muted",
+                     if(!is.na(node_info$canonical_name[1]) && nchar(node_info$canonical_name[1]) > 0) {
+                       tags$em(node_info$canonical_name[1])
                      } else {
                        node_info$label
                      },
-                     if(!is.na(node_info$gbif[[1]]$taxonomic_status) && nchar(node_info$gbif[[1]]$taxonomic_status) > 0) {
-                       tags$span(class = "ms-2", paste0("(", node_info$gbif[[1]]$taxonomic_status, ")"))
+                     if(!is.na(node_info$taxonomic_status[1]) && nchar(node_info$taxonomic_status[1]) > 0) {
+                       tags$span(class = "ms-2", paste0("(", node_info$taxonomic_status[1], ")"))
                      })
           )
         )
       ),
-      
+
+      # 分類階層の表示
+      if(!is.na(node_info$kingdom) || !is.na(node_info$phylum) || !is.na(node_info$class) ||
+         !is.na(node_info$order) || !is.na(node_info$family) || !is.na(node_info$genus)) {
+        div(class = "mb-3",
+          tags$h6(i18n$t("Taxonomic Rank"), class = "text-muted mb-2"),
+          tags$div(
+            class = "text-primary",
+            paste(
+              c(
+                if(!is.na(node_info$kingdom)) node_info$kingdom else NULL,
+                if(!is.na(node_info$phylum)) node_info$phylum else NULL,
+                if(!is.na(node_info$class)) node_info$class else NULL,
+                if(!is.na(node_info$order)) node_info$order else NULL,
+                if(!is.na(node_info$family)) node_info$family else NULL,
+                if(!is.na(node_info$genus)) node_info$genus else NULL
+              ),
+              collapse = " > "
+            )
+          )
+        )
+      },
+
       div(class = "node-description",
         if(!is.na(node_info$abstract) && nchar(node_info$abstract) > 0) {
           div(
@@ -580,28 +663,28 @@ server <- function(input, output, session) {
             },
             tags$br(),
             if(!is.na(node_info$url) && nchar(node_info$url) > 0) {
-              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", i18n$t("続きを読む"))
+              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", i18n$t("Read more"))
           }
           )
         } else {
           div(
-            i18n$t("この分類群についての説明文は利用できません。"),
+            i18n$t("Description for this taxon is not available."),
             tags$br(),
             if(!is.na(node_info$url) && nchar(node_info$url) > 0) {
-              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", i18n$t("続きを読む"))
+              tags$a(href = node_info$url, target = "_blank", class = "text-primary ms-1", i18n$t("Read more"))
             }
           )
         }
       ),
-      
+
       tags$hr(),
-      
+
       div(class = "row g-3 mt-3",
         div(class = "col-6",
           div(class = "metric-card",
             div(class = "metric-icon", icon("eye")),
             div(class = "metric-label", "Pageviews"),
-            div(class = "metric-value", 
+            div(class = "metric-value",
                 if (pageviews == 0) {
                   "N/A"
                 } else if (pageviews > 1000000) {
@@ -617,7 +700,7 @@ server <- function(input, output, session) {
           div(class = "metric-card",
             div(class = "metric-icon", icon("edit")),
             div(class = "metric-label", "Edit Count"),
-            div(class = "metric-value", 
+            div(class = "metric-value",
                 if (edit_count == 0) "N/A" else format(edit_count, big.mark = ","))
           )
         ),
@@ -625,7 +708,7 @@ server <- function(input, output, session) {
           div(class = "metric-card",
             div(class = "metric-icon", icon("star")),
             div(class = "metric-label", "Core Index"),
-            div(class = "metric-value", 
+            div(class = "metric-value",
                 if (core_index == 0) "N/A" else round(core_index, 1))
           )
         ),
@@ -633,7 +716,7 @@ server <- function(input, output, session) {
           div(class = "metric-card",
             div(class = "metric-icon", icon("sitemap")),
             div(class = "metric-label", "SCI"),
-            div(class = "metric-value", 
+            div(class = "metric-value",
                 if (sci_value == 0) "N/A" else sprintf("%.2f", sci_value))
           )
         ),
@@ -641,7 +724,7 @@ server <- function(input, output, session) {
           div(class = "metric-card",
             div(class = "metric-icon", icon("file-alt")),
             div(class = "metric-label", "Page Length"),
-            div(class = "metric-value", 
+            div(class = "metric-value",
                 if (!is.na(node_info$page_length_bytes) && node_info$page_length_bytes > 0) {
                   if (node_info$page_length_bytes > 1024*1024) {
                     paste0(round(node_info$page_length_bytes/(1024*1024), 1), " MB")
@@ -659,7 +742,7 @@ server <- function(input, output, session) {
           div(class = "metric-card",
             div(class = "metric-icon", icon("chart-line")),
             div(class = "metric-label", "Excess Focus"),
-            div(class = "metric-value", 
+            div(class = "metric-value",
                 if (!is.na(node_info$excess_focus) && node_info$excess_focus != 0) {
                   sprintf("%.2f", node_info$excess_focus)
                 } else {
@@ -671,7 +754,7 @@ server <- function(input, output, session) {
           div(class = "metric-card",
             div(class = "metric-icon", icon("calendar")),
             div(class = "metric-label", "Last Modified"),
-            div(class = "metric-value", 
+            div(class = "metric-value",
                 if (!is.na(node_info$date_modified) && nchar(node_info$date_modified) > 0) {
                   format(as.Date(node_info$date_modified), "%Y-%m-%d")
                 } else {
@@ -682,65 +765,65 @@ server <- function(input, output, session) {
       )
     )
   })
-  
+
   output$network_stats <- shiny::renderUI({
     data <- network_data()
-    
+
     div(
-      tags$h5(i18n$t("ネットワーク統計"), class = "mb-3"),
+      tags$h5(i18n$t("Network Statistics"), class = "mb-3"),
       tags$table(class = "table table-sm",
         tags$tbody(
           tags$tr(
-            tags$td(i18n$t("ノード数:")),
+            tags$td(i18n$t("Node count:")),
             tags$td(nrow(data$nodes))
           ),
           tags$tr(
-            tags$td(i18n$t("エッジ数:")),
+            tags$td(i18n$t("Edge count:")),
             tags$td(nrow(data$edges))
           ),
           tags$tr(
-            tags$td(i18n$t("選択された分類群:")),
+            tags$td(i18n$t("Selected taxa:")),
             tags$td(length(selected_taxa()))
           ),
           tags$tr(
-            tags$td(i18n$t("表示言語数:")),
+            tags$td(i18n$t("Display languages:")),
             tags$td(length(input$language_version))
           )
         )
       )
     )
   })
-  
+
   # GBIF情報のサマリー表示
-  output$gbif_summary <- renderUI({
+  output$gbif_summary <- shiny::renderUI({
     req(selected_node_id())
-    
-    node_info <- nodes |> 
-      dplyr::filter(id == selected_node_id()) |> 
+
+    node_info <- nodes |>
+      dplyr::filter(id == selected_node_id()) |>
       dplyr::slice_head(n = 1)
-    
+
     if (nrow(node_info) == 0) {
-      return(div(i18n$t("ノード情報が見つかりません")))
+      return(div(i18n$t("Node information not found")))
     }
-    
+
     # GBIF情報を取得
     gbif_data <- node_info$gbif[[1]]
-    
+
     if (is.null(gbif_data)) {
       return(
         div(
           class = "alert alert-info text-center",
           icon("info-circle", class = "me-2"),
-          i18n$t("利用可能なGBIF情報がありません")
+          i18n$t("No GBIF information available")
         )
       )
     }
-    
+
     # データの形式を確認
     record_count <- nrow(gbif_data)
-    
+
     div(
-      tags$h5(i18n$t("GBIF情報"), class = "mb-3"),
+      tags$h5(i18n$t("GBIF Information"), class = "mb-3"),
       div(
         class = "alert alert-success",
         icon("check-circle", class = "me-2"),
@@ -748,37 +831,39 @@ server <- function(input, output, session) {
       )
     )
   })
-  
+
   # GBIF情報のテーブル表示
-  output$gbif_table <- DT::renderDataTable({
+  output$gbif_table <-
+    DT::renderDataTable({
     req(selected_node_id())
-    
-    node_info <- nodes |> 
-      dplyr::filter(id == selected_node_id()) |> 
+
+    node_info <-
+      nodes |>
+      dplyr::filter(id == selected_node_id()) |>
       dplyr::slice_head(n = 1)
-    
+
     if (nrow(node_info) == 0) {
       return(data.frame())
     }
-    
+
     # GBIF情報を取得
     gbif_data <- node_info$gbif[[1]]
-    
+
     if (is.null(gbif_data)) {
       return(data.frame())
     }
-    
+
     # データフレームでない場合やレコードがない場合の処理
     if (!is.data.frame(gbif_data) && !is.list(gbif_data)) {
       return(data.frame())
     }
-    
+
     # データフレームの列名を日本語と英語で表示するためのマッピング
     col_mapping <- list(
       "gbif_id" = "GBIF ID",
-      "canonical_name" = i18n$t("正規名"),
-      "taxon_rank" = i18n$t("分類学的ランク"),
-      "taxonomic_status" = i18n$t("分類学的状態"),
+      "canonical_name" = i18n$t("Canonical Name"),
+      "taxon_rank" = i18n$t("Taxonomic Rank"),
+      "taxonomic_status" = i18n$t("Taxonomic Status"),
       "kingdom" = "Kingdom",
       "phylum" = "Phylum",
       "class" = "Class",
@@ -787,11 +872,11 @@ server <- function(input, output, session) {
       "genus" = "Genus",
       "species" = "Species"
     )
-    
+
     # GBIF データの構造を確認してデータフレームに変換
     if (is.data.frame(gbif_data)) {
       # 既にデータフレームの場合
-      display_data <- gbif_data |> 
+      display_data <- gbif_data |>
         dplyr::select(dplyr::any_of(names(col_mapping)))
     } else {
       # リスト形式の場合、データフレームに変換
@@ -805,7 +890,7 @@ server <- function(input, output, session) {
             display_list[[col_mapping[[col]]]] <- gbif_data[[col]]
           }
         }
-        
+
         if (length(display_list) > 0) {
           # 長さを統一（最長の要素に合わせる）
           max_length <- max(sapply(display_list, length))
@@ -824,7 +909,7 @@ server <- function(input, output, session) {
         display_data <- data.frame()
       }
     }
-    
+
     # GBIF IDがある場合はリンクを作成
     if ("gbif_id" %in% names(display_data)) {
       display_data$`GBIF Link` <- sprintf(
@@ -832,7 +917,7 @@ server <- function(input, output, session) {
         display_data$gbif_id
       )
     }
-    
+
     DT::datatable(
       display_data,
       options = list(
@@ -840,7 +925,7 @@ server <- function(input, output, session) {
         scrollX = TRUE,
         dom = 'tp',
         language = list(
-          search = i18n$t("検索"),
+          search = i18n$t("Search"),
           info = "_START_ から _END_ まで（全 _TOTAL_ 件）",
           paginate = list(
             previous = "Previous",
